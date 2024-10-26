@@ -3,7 +3,7 @@
     use FW\Router\Route;
 
     Route::register([
-        __DIR__ ."/module/api"
+        "/module/api"
     ]);
     
     Route::set404(function() {
