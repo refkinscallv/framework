@@ -8,26 +8,35 @@
 
         public static function init($routes) {
             self::$routes = $routes;
-
+    
             if (isset($routes['maintenance'])) {
                 self::callFunction($routes['maintenance']['callback']);
                 return;
             }
-
+    
             $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             $requestMethod = $_SERVER['REQUEST_METHOD'];
-
+    
             foreach ($routes['routes'] as $path => $route) {
                 $params = [];
                 if (self::matchRoute($path, $requestUri, $params)) {
                     if ($route['method'] === strtoupper($requestMethod)) {
+                        if (!empty($route['middleware'])) {
+                            if(!is_array($route['middleware'])) {
+                                throw new \InvalidArgumentException("Middleware must be array.");
+                            }
+
+                            $middleware = new $route['middleware'][0](new \FW\Http\Request(), new \FW\Http\Response());
+                            $middleware->{$route['middleware'][1]}();
+                        }
+    
                         $callbackParams = self::prepareCallbackParams($route['callback'], $params);
                         self::callFunction($route['callback'], $callbackParams);
                         return;
                     }
                 }
             }
-
+    
             if (isset($routes['404'])) {
                 self::callFunction($routes['404']['callback']);
             } else {

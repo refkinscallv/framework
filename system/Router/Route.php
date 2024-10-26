@@ -3,7 +3,6 @@
     namespace FW\Router;
 
     use FW\Router\RouteCollect as Collect;
-    use FW\Router\RouteMiddleware as Middleware;
     use FW\Router\RouteExecution as Execution;
     use FW\Common\FileSystem;
 
@@ -11,12 +10,6 @@
 
         private static $storage = [];
         private static $prefix = "";
-
-        public static function middleware($callback) {
-            self::$storage['middleware'] = self::$storage['middleware'] ?? [];
-            self::$storage['middleware'][] = $callback;
-            return new self();
-        }
 
         public static function register(array $list = []) {
             if (!empty($list)) {
@@ -60,41 +53,41 @@
             return self::$prefix . '/' . ltrim($path, '/');
         }
 
-        public static function set($path, $callUserFunc, $method = "GET") {
+        private static function set($path, $callUserFunc, $method = "GET", $middleware = []) {
             $path = self::applyPrefix($path);
             self::$storage["routes"][$path] = [
                 "callback" => $callUserFunc,
-                "method" => $method
+                "method" => $method,
+                "middleware" => $middleware
             ];
         }
 
-        public static function get($path, $callUserFunc) {
-            self::set($path, $callUserFunc, 'GET');
+        public static function get($path, $callUserFunc, $middleware = []) {
+            self::set($path, $callUserFunc, 'GET', $middleware);
         }
 
-        public static function post($path, $callUserFunc) {
-            self::set($path, $callUserFunc, 'POST');
+        public static function post($path, $callUserFunc, $middleware = []) {
+            self::set($path, $callUserFunc, 'POST', $middleware);
         }
 
-        public static function put($path, $callUserFunc) {
-            self::set($path, $callUserFunc, 'PUT');
+        public static function put($path, $callUserFunc, $middleware = []) {
+            self::set($path, $callUserFunc, 'PUT', $middleware);
         }
 
-        public static function delete($path, $callUserFunc) {
-            self::set($path, $callUserFunc, 'DELETE');
+        public static function delete($path, $callUserFunc, $middleware = []) {
+            self::set($path, $callUserFunc, 'DELETE', $middleware);
         }
 
-        public static function patch($path, $callUserFunc) {
-            self::set($path, $callUserFunc, 'PATCH');
+        public static function patch($path, $callUserFunc, $middleware = []) {
+            self::set($path, $callUserFunc, 'PATCH', $middleware);
         }
 
-        public static function options($path, $callUserFunc) {
-            self::set($path, $callUserFunc, 'OPTIONS');
+        public static function options($path, $callUserFunc, $middleware = []) {
+            self::set($path, $callUserFunc, 'OPTIONS', $middleware);
         }
 
         public static function run() {
             Collect::init(self::$storage, function($routes) {
-                Middleware::init($routes);
                 Execution::init($routes);
             });
         }
