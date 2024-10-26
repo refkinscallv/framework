@@ -21,7 +21,7 @@
         public static function register(array $list = []) {
             if (!empty($list)) {
                 foreach ($list as $val) {
-                    $filePath = FileSystem::docRoot("/" . $val . ".php");
+                    $filePath = FileSystem::docRoot("/app/Routes" . $val . ".php");
                     if (file_exists($filePath)) {
                         require $filePath;
                     } else {
