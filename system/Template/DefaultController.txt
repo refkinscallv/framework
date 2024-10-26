@@ -1,0 +1,17 @@
+<?php
+
+    namespace [__namespace__];
+
+    use FW\App\Controllers\BaseController;
+
+    class [__classname__] extends BaseController {
+
+        public function __construct() {
+            parent::__construct();
+        }
+
+        public function index() {
+            echo "[__classname__]::index()";
+        }
+
+    }

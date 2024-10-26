@@ -1,0 +1,15 @@
+<?php
+
+    namespace [__namespace__];
+
+    use Illuminate\Database\Eloquent\Model;
+
+    class [__classname__] extends Model {
+
+        public function __construct() {
+            
+            protected $table = "";
+
+        }
+
+    }

@@ -1,0 +1,17 @@
+<?php
+
+    namespace [__namespace__];
+
+    use FW\App\Services\BaseService;
+
+    class [__classname__] extends BaseService {
+
+        public function __construct() {
+            parent::__construct();
+        }
+
+        public function index() {
+            return $this->result(true, 200, "OK");
+        }
+
+    }

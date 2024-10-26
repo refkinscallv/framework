@@ -1,0 +1,27 @@
+# PHP Timezone
+# php_value date.timezone "Zone/Region"
+php_value date.timezone "Asia/Jakarta"
+
+# Basic URI config
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [L]
+
+# Block access to .env file
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ".env.example">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to any hidden files (files starting with .)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+    Satisfy All
+</FilesMatch>

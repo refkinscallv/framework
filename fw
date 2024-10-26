@@ -1,0 +1,11 @@
+<?php
+
+    if (PHP_SAPI !== "cli") {
+        die("This script must be run from the command line.");
+    }
+
+    use FW\Command\Execution;
+
+    require "system/Command/Execution.php";
+
+    Execution::run($argc, $argv);
