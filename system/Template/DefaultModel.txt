@@ -6,10 +6,6 @@
 
     class [__classname__] extends Model {
 
-        public function __construct() {
-            
-            protected $table = "";
-
-        }
+        protected $table = "";
 
     }
