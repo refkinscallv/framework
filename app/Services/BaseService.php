@@ -12,4 +12,19 @@
             
         }
 
+        public function result($status = true, $code = 200, $message = null, $result = null, $custom = []): array {
+            $defaultResponse = [
+                "status" => $status,
+                "code" => $code,
+                "message" => $message,
+                "result" => $result
+            ];
+            
+            if(is_array($custom) && !empty($custom)) {
+                return array_merge($defaultResponse, $custom);
+            }
+
+            return $defaultResponse;
+        }
+
     }
