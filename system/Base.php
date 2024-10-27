@@ -5,15 +5,14 @@
     use FW\App\Libraries\Cookie;
     use FW\App\Libraries\Crypto;
     use FW\App\Libraries\Session;
-    use FW\Package\Common\Common;
-    use FW\Package\Common\FileSystem;
+    use FW\Common\Common;
+    use FW\Common\FileSystem;
     use FW\Http\Request;
     use FW\Http\Response;
     use FW\Http\Validation;
     use FW\Mailer\Mailer;
 
     class Base {
-
         public Common $common;
         public FileSystem $fileSystem;
         public Cookie $cookie;
@@ -24,18 +23,25 @@
         public Validation $validation;
         public Mailer $mailer;
 
-        public function __construct() {
+        public function __construct(array $except = []) {
             
-            $this->common = new Common();
-            $this->fileSystem = new FileSystem();
-            $this->cookie = new Cookie();
-            $this->session = new Session();
-            $this->crypto = new Crypto();
-            $this->request = new Request();
-            $this->response = new Response();
-            $this->validation = new Validation();
-            $this->mailer = new Mailer();
-            
-        }
+            $list = [
+                "common" => Common::class,
+                "fileSystem" => FileSystem::class,
+                "cookie" => Cookie::class,
+                "session" => Session::class,
+                "crypto" => Crypto::class,
+                "request" => Request::class,
+                "response" => Response::class,
+                "validation" => Validation::class,
+                "mailer" => Mailer::class,
+            ];
 
+            foreach ($list as $property => $class) {
+                if (!in_array($property, $except, true)) {
+                    $this->{$property} = new $class();
+                }
+            }
+
+        }
     }

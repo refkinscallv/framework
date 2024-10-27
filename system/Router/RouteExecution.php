@@ -38,6 +38,7 @@
             }
     
             if (isset($routes['404'])) {
+                header("HTTP/1.0 404 Not Found");
                 self::callFunction($routes['404']['callback']);
             } else {
                 header("HTTP/1.0 404 Not Found");

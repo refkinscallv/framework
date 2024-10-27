@@ -3,13 +3,15 @@
     namespace FW\Http;
 
     use FW\Common\FileSystem;
+    use FW\Base;
     use Exception;
 
-    class Response {
+    class Response extends Base {
 
         public $viewData;
 
         public function __construct() {
+            parent::__construct(['response']);
             $this->viewData = [];
         }
 
@@ -30,7 +32,9 @@
         }
 
         public function view($file, $data = []) {
-            if (!file_exists($file . ".php")) {
+            $viewFile = FileSystem::docRoot("/public/views/" . $file . ".php");
+
+            if (!file_exists($viewFile)) {
                 throw new Exception("View file not found: " . $file . ".php");
             }
 
@@ -38,7 +42,7 @@
             
             extract($this->viewData);
             
-            include FileSystem::docRoot("/public/views/" . $file . ".php");
+            include $viewFile;
         }
 
         public function json($data, $flag = JSON_UNESCAPED_SLASHES) {
