@@ -18,7 +18,7 @@
             $this->cookieName = $_SERVER["COOKIE_NAME"] ?? "web_cookie";
             $this->cookieExpire = $_SERVER["COOKIE_EXPIRES"] ?? 24;
             $this->cookiePath = $_SERVER["COOKIE_PATH"] ?? "/";
-            $this->cookieDomain = $_SERVER["COOKIE_DOMAIN"] ?? $_SERVER["SERVER_NAME"];
+            $this->cookieDomain = $_SERVER["SERVER_NAME"];
             $this->cookieSecure = $_SERVER["COOKIE_SECURE"] ?? false;
             $this->cookieEncrypt = $db ? $this->encryption($db) : false;
         }
@@ -66,14 +66,19 @@
 
             $setCookie = $this->cookieEncrypt ? $this->cookieEncrypt->encrypt($allCookie, "array") : serialize($allCookie);
 
+            if (headers_sent()) {
+                throw new Exception("Cannot set cookie; headers already sent.");
+            }
+
             if (!setcookie(
                 $this->cookieName,
                 $setCookie,
-                time() + ($this->cookieExpire * 3600),
-                $this->cookiePath,
-                $this->cookieDomain,
-                $this->cookieSecure,
-                !$this->cookieSecure
+                [
+                    'expires' => time() + ($this->cookieExpire * 3600),
+                    'path' => $this->cookiePath,
+                    'secure' => $this->cookieSecure,
+                    'httponly' => true
+                ]
             )) {
                 throw new Exception("Failed to set cookie: " . $this->cookieName);
             }
@@ -97,11 +102,12 @@
             if (!setcookie(
                 $this->cookieName,
                 $setCookie,
-                time() + ($this->cookieExpire * 3600),
-                $this->cookiePath,
-                $this->cookieDomain,
-                $this->cookieSecure,
-                !$this->cookieSecure
+                [
+                    'expires' => time() + ($this->cookieExpire * 3600),
+                    'path' => $this->cookiePath,
+                    'secure' => $this->cookieSecure,
+                    'httponly' => true
+                ]
             )) {
                 throw new Exception("Failed to unset cookie: " . $this->cookieName);
             }
@@ -110,11 +116,21 @@
         }
 
         public function destroy() {
-            return setcookie($this->cookieName, "", time() - 3600, $this->cookiePath, $this->cookieDomain, $this->cookieSecure, !$this->cookieSecure);
+            return setcookie(
+                $this->cookieName,
+                '',
+                [
+                    'expires' => time() - 3600,
+                    'path' => $this->cookiePath,
+                    'secure' => $this->cookieSecure,
+                    'httponly' => true
+                ]
+            );
         }
 
         public function encryption($db) {
             $this->crypto = $db;
             return $this->crypto;
         }
+        
     }

@@ -22,7 +22,7 @@
 
         public function get($name) {
             if (!$this->has($name)) {
-                throw new Exception("File '{$name}' does not exist.");
+                return false;
             }
             return $this->files[$name];
         }

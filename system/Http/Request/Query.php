@@ -36,7 +36,7 @@
 
         public function get($key) {
             if (!$this->has($key)) {
-                throw new Exception("Query parameter '{$key}' not found.");
+                return false;
             }
             return $this->query[$key];
         }

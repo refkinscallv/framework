@@ -10,6 +10,7 @@
 
         private static $storage = [];
         private static $prefix = "";
+        private static $groupMiddleware = [];
 
         public static function register(array $list = []) {
             if (!empty($list)) {
@@ -40,13 +41,15 @@
             }
         }
 
-        public static function group(array $attr, callable $callback) {
-            $prevPrefix = self::$prefix;
-            self::$prefix = rtrim($prevPrefix . ($attr["prefix"] ?? ""), "/");
-
+        public static function group(array $attributes, callable $callback) {
+            $previousPrefix = self::$prefix;
+            self::$prefix .= $attributes['prefix'] ?? '';
+            self::$groupMiddleware = $attributes['middleware'] ?? [];
+    
             $callback();
-
-            self::$prefix = $prevPrefix;
+    
+            self::$prefix = $previousPrefix;
+            self::$groupMiddleware = [];
         }
 
         private static function applyPrefix($path) {
@@ -56,9 +59,9 @@
         private static function set($path, $callUserFunc, $method = "GET", $middleware = []) {
             $path = self::applyPrefix($path);
             self::$storage["routes"][$path] = [
-                "callback" => $callUserFunc,
-                "method" => $method,
-                "middleware" => $middleware
+                'method' => $method,
+                'callback' => $callUserFunc,
+                'middleware' => array_merge(self::$groupMiddleware, $middleware)
             ];
         }
 

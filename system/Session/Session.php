@@ -12,7 +12,7 @@
 
         public function __construct() {
             $this->sessionTimeout = ($this->getServerValue("SESSION_TIMEOUT", 1) * 3600);
-            $this->sessionDomain = $this->getServerValue("SESSION_DOMAIN", $_SERVER["SERVER_NAME"]);
+            $this->sessionDomain = $_SERVER["SERVER_NAME"];
             $this->sessionPath = $this->getServerValue("SESSION_PATH", '/');
             $this->sessionSecure = (bool)$this->getServerValue("SESSION_SECURE", false);
             $this->sessionName = $this->getServerValue("SESSION_NAME", 'web_session');

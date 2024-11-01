@@ -22,13 +22,21 @@
                 if (self::matchRoute($path, $requestUri, $params)) {
                     if ($route['method'] === strtoupper($requestMethod)) {
                         if (!empty($route['middleware'])) {
-                            if(!is_array($route['middleware'])) {
-                                throw new \InvalidArgumentException("Middleware must be array.");
+                            if (!is_array($route['middleware']) || count($route['middleware']) !== 2) {
+                                throw new \InvalidArgumentException("Middleware must be an array with two elements: [class, method].");
                             }
-
-                            $middleware = new $route['middleware'][0](new \FW\Http\Request(), new \FW\Http\Response());
-                            $middleware->{$route['middleware'][1]}();
+                        
+                            $mwClass = $route['middleware'][0];
+                            $mwMethod = $route['middleware'][1];
+                        
+                            if (!class_exists($mwClass) || !method_exists($mwClass, $mwMethod)) {
+                                throw new \InvalidArgumentException("Invalid middleware class or method: '{$mwClass}::{$mwMethod}'.");
+                            }
+                        
+                            $middleware = new $mwClass(new \FW\Http\Request(), new \FW\Http\Response());
+                            $middleware->{$mwMethod}();
                         }
+                        
     
                         $callbackParams = self::prepareCallbackParams($route['callback'], $params);
                         self::callFunction($route['callback'], $callbackParams);
@@ -58,7 +66,13 @@
             
             foreach ($pathParts as $index => $part) {
                 if (self::isPlaceholder($part)) {
-                    $params[] = self::sanitize($uriParts[$index] ?? '');
+                    if (isset($uriParts[$index])) {
+                        $params[] = self::sanitize($uriParts[$index]);
+                    } elseif (self::isOptionalPlaceholder($part)) {
+                        $params[] = '';
+                    } else {
+                        return false;
+                    }
                 } elseif ($part !== $uriParts[$index]) {
                     return false;
                 }
@@ -71,10 +85,19 @@
             return strpos($part, '{') === 0 && strpos($part, '}') === strlen($part) - 1;
         }
 
+        private static function isOptionalPlaceholder($part) {
+            return strpos($part, '?}') !== false;
+        }
+
         private static function prepareCallbackParams($callback, $params) {
             $callbackParams = [];
-            
-            $reflection = new \ReflectionFunction($callback);
+
+            if (is_array($callback)) {
+                $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+            } else {
+                $reflection = new \ReflectionFunction($callback);
+            }
+
             $numParams = $reflection->getNumberOfParameters();
 
             if ($numParams > 0) {
