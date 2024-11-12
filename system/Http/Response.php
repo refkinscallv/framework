@@ -13,6 +13,7 @@
         public function __construct() {
             parent::__construct(['response']);
             $this->viewData = [];
+            $this->response = $this;
         }
 
         public function withHttpResponseCode($code) {

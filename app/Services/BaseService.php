@@ -27,4 +27,12 @@
             return $defaultResponse;
         }
 
+        protected function handler(callable $callback) {
+            try {
+                return $callback();
+            } catch (\Exception $e) {
+                return $this->result(false, 200, $e->getMessage());
+            }
+        }
+
     }
